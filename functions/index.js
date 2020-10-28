@@ -17,7 +17,7 @@ exports.BadLanguage = functions.https.onRequest((request, response) => {
             for (let i = 0; i < pottywords.length; i++){
                 if(message.match(pottywords[i])) {
                     axios
-                    .post('', {
+                    .post('CHANGE ME', {
                         text: `Rude word ${pottywords[i]} detected. Please consider using kinder language.`
                     })
                     .then(res => {
