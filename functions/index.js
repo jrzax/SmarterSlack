@@ -56,42 +56,43 @@ exports.BadLanguage = functions.https.onRequest((request, response) => {
 
 const db = admin.firestore();
 const usersRef = db.collection("users");
-exports.AlphaDomination = functions.https.onRequest((request, response) => {
-  if (request) {
-    functions.logger.log("Here's the request:", request.body);
-    // console.log(request.body); use this to determine information about messages
-    response.status(200).send(request.body);
-    if (request.body.event.subtype == "bot_message") {
-      return;
-    } else {
-      let userID = request.body.event.user; //get user id from sent message
-      console.log("userID:", userID);
-      const userRef = db.collection("users").doc(userID);
-      console.log("userRef:", userRef);
-      const doc = userRef.get();
-      console.log("doc:", doc);
-
-      if (!doc.exists) {
-        console.log("No such document!");
-        // console.log("USER NAME?", request.body);
-        usersRef.doc(userID).set({ numMessages: 2 });
-      } else {
-        console.log("Document data:", doc.data());
-        axios
-          .post("CHANGE ME", {
-            text: `Im a bot with a message.`,
-          })
-          .then((res) => {
-            functions.logger.log(`statusCode: ${res.statusCode}`);
-            functions.logger.log(res);
-          })
-          .catch((error) => {
-            functions.logger.log(error);
-          });
+exports.AlphaDomination = functions.https.onRequest(
+  async (request, response) => {
+    if (request) {
+      functions.logger.log("NEW RUN STARTS HERE");
+      functions.logger.log("Here's the request:", request.body);
+      response.status(200).send(request.body);
+      if (request.body.event.subtype == "bot_message") {
         return;
+      } else {
+        let userID = request.body.event.user; //get user id from sent message
+        const userRef = db.collection("users").doc(userID);
+        const doc = await userRef.get();
+
+        if (!doc.exists) {
+          console.log("No such document!");
+          await usersRef.doc(userID).set({ numMessages: 1 });
+        } else {
+          await userRef.update({
+            numMessages: admin.firestore.FieldValue.increment(1),
+          });
+          console.log("Document data:", doc.data());
+          axios
+            .post("CHANGE ME", {
+              text: `Im a bot with a message. The last message user id is: ${userID}`,
+            })
+            .then((res) => {
+              functions.logger.log(`statusCode: ${res.statusCode}`);
+              functions.logger.log(res);
+            })
+            .catch((error) => {
+              functions.logger.log(error);
+            });
+          return;
+        }
       }
+    } else {
+      throw response.status(500);
     }
-  } else {
-    throw response.status(500);
   }
-});
+);
