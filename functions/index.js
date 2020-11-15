@@ -23,10 +23,15 @@ admin.initializeApp(firebaseConfig);
 //db.collection("Users").doc(USERID).add({numMessages: ##})
 
 const db = admin.firestore();
-const usersRef = db.collection("users");
+
+
 exports.AlphaDomination = functions.https.onRequest(
   async (request, response) => {
+
+    const usersRef = db.collection("users");
+    const channelsRef = db.collection("channels");
     const pottywords = ["butthead", "crap", "stupid"];
+
     if (request) {
       functions.logger.log("NEW RUN STARTS HERE");
       functions.logger.log("Here's the request:", request.body);
@@ -35,6 +40,7 @@ exports.AlphaDomination = functions.https.onRequest(
         return;
       } else {
         let userID = request.body.event.user; //get user id from sent message
+        let channelName = request.body.event.channel; //new doc being created for new channel
         //BAD LANGUAGE STUFF
         let message = request.body.event.text;
         let badWordsCount = 0;
@@ -45,12 +51,22 @@ exports.AlphaDomination = functions.https.onRequest(
         }
         const userRef = db.collection("users").doc(userID);
         const doc = await userRef.get();
+        const snapshot = await usersRef.get();
+
+        if (snapshot.empty) { 
+          console.log('No matching documents.'); 
+        return; 
+          }
+        snapshot.forEach(doc => {   console.log(doc.id, '=>', doc.data())
+          ; }
+        ); 
+
 
         if (!doc.exists) {
           console.log("No such document!");
           await usersRef
             .doc(userID)
-            .set({ numMessages: 1, numBadWords: badWordsCount });
+            .set({ numMessages: 0, numBadWords: badWordsCount });
         } else {
           await userRef.update({
             numMessages: admin.firestore.FieldValue.increment(1),
