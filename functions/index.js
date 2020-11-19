@@ -3,7 +3,7 @@ const axios = require("axios");
 const admin = require("firebase-admin");
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDkPViosTHWG15Jo5hxyYsQZ6O8RtupZYM",
+  apiKey: "CHANGE ME",
   authDomain: "smarter-teams-in-slack.firebaseapp.com",
   databaseURL: "https://smarter-teams-in-slack.firebaseio.com",
   projectId: "smarter-teams-in-slack",
