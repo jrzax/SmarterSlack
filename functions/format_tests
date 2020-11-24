@@ -1,0 +1,9 @@
+let msg = { U01D610BZ0U: [4, 1], U01EHR8E4K1: [18, 0] };
+console.log('Bad Words Ranking:');
+let num = 0;
+for (var key in msg) {
+  if (msg.hasOwnProperty(key)) {
+    num = num + 1;
+    console.log(num + '. ' + key + ' has a score of ' + msg[key][1]);
+  }
+}
