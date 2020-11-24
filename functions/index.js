@@ -47,14 +47,14 @@ exports.AlphaDomination = functions.https.onRequest(
         functions.logger.log(request)
         let userID = request.body.event.user; //get user id from sent message
         let channelName = request.body.event.channel; //new doc being created for new channel
-        
+
         //BAD LANGUAGE STUFF
         let message = request.body.event.text;
         let badWordsCount = 0;
         for (let i = 0; i < pottywords.length; i++) {
           if (message.match(pottywords[i])) {
             badWordsCount += 1;
-          } 
+          }
         }
 
         functions.logger.log(today)
@@ -93,7 +93,7 @@ exports.AlphaDomination = functions.https.onRequest(
               if (snapshot.exists) {
                 //User exists, update add a document for a new day, update total counts
                 userRef.collection('history').add({
-                  numMessages: 1, numBadWords: badWordsCount, date: today 
+                  numMessages: 1, numBadWords: badWordsCount, date: today
                })
                userRef.update({
                  numMessages: admin.firestore.FieldValue.increment(1),
@@ -138,7 +138,7 @@ exports.AlphaDomination = functions.https.onRequest(
               //Testing to see if the channel exists
               if (snapshot.exists) {
                 channelRef.collection('history').add({
-                  numMessages: 1, numBadWords: badWordsCount, date: today 
+                  numMessages: 1, numBadWords: badWordsCount, date: today
                })
                channelRef.update({
                  numMessages: admin.firestore.FieldValue.increment(1),
@@ -170,14 +170,16 @@ exports.AlphaDomination = functions.https.onRequest(
 );
 
 exports.SmartReport = functions.https.onRequest(
-  async (request, response) => {   
-    if (request){    
-      functions.logger.log("Here's the request:", request.body)      
-      console.log("A request")      
+  async (request, response) => {
+    if (request){
+      functions.logger.log("Here's the request:", request.body)
+      console.log("A request")
 
       const usersRef = db.collection('users')
 
-      let result = {}
+      let result_numMessages = {}
+      let result_badWords = {}
+
       await usersRef.get().then(querySnapshot => {
 
         // let result = {userID: [10, 9]}
@@ -185,7 +187,8 @@ exports.SmartReport = functions.https.onRequest(
         // to get userId result[0]
         querySnapshot.forEach((doc) => {
           let data = doc.data()
-          result[doc.id] = [data.numMessages, data.numBadWords]
+          result_numMessages[doc.id] = data.numMessages
+          result_badWords[doc.id] = data.numBadWords
         });
 
       }).catch((error) => {
@@ -193,7 +196,44 @@ exports.SmartReport = functions.https.onRequest(
         result = false
       })
 
-      functions.logger.log(result)
+      var keyValues_badWords = []
+      for (var key in result_numMessages) {
+        keyValues_badWords.push([ key, result_badWords[key]])}
+
+      var keyValues_numMessages = []
+      for (var key in result_numMessages) {
+        keyValues_numMessages.push([ key, result_numMessages[key]])}
+
+      // console.log(keyValues_numMessages)
+      // console.log(keyValues_badWords)
+
+
+      keyValues_badWords.sort(function compare(kv1, kv2) {
+        return kv2[1] - kv1[1]})
+      let new_text = '*Bad Words Ranking: *';
+      for (var i=0; i<keyValues_badWords.length; i++)
+        {
+          new_text = new_text + '\n' + String(i+1) + '. ' + '<@' + String(keyValues_badWords[i][0]) + '>' + ' has ' + String(keyValues_badWords[i][1]) + ' messages with foul language';
+        }
+
+
+      keyValues_numMessages.sort(function compare(kv1, kv2) {
+        return kv2[1] - kv1[1]})
+      new_text = new_text + '\n' + '\n' + '*Alpha Domination Ranking: *'
+      for (var i=0; i<keyValues_numMessages.length; i++)
+        {
+          new_text = new_text + '\n' + String(i+1) + '. ' + '<@' + String(keyValues_numMessages[i][0]) + '>' + ' has spoken ' + String(keyValues_numMessages[i][1]) + ' times';
+        }
+
+      keyValues_numMessages.sort(function compare(kv1, kv2) {
+          return kv1[1] - kv2[1]})
+      new_text = new_text + '\n' + '\n' + '*Speak Up Ranking: *'
+      for (var i=0; i<keyValues_numMessages.length; i++)
+          {
+            new_text = new_text + '\n' + String(i+1) + '. ' + '<@' + String(keyValues_numMessages[i][0]) + '>' + ' has spoken ' + String(keyValues_numMessages[i][1]) + ' times';
+          }
+
+      // functions.logger.log(result)
       // result.sort((a,b) => {
       //   return a[0] - b[0]
       // })
@@ -206,27 +246,43 @@ exports.SmartReport = functions.https.onRequest(
 
       // let badList = result
 
-      // let text = ''
-      // let count = 1
-      // alphaList.forEach((element) => {
-      //   text.push(count + '. ' + element[0])
-      // })
+      // let new_text = 'Speak Up Ranking: ';
+      // for (var i=0; i<keyValues_numMessages.length; i++)
+      //   {
+      //     new_text = new_text + '\n' + String(i+1) + '. ' + '<@' + String(keyValues_numMessages[i][0]) + '>' + ' has a score of ' + String(keyValues_numMessages[i][1]);
+      //   }
+      // new_text = new_text + '\n' + '\n' + 'Alpha Domination Ranking: '
+      // for (var i=0; i<keyValues_numMessages_Alpha.length; i++)
+      //   {
+      //     new_text = new_text + '\n' + String(i+1) + '. ' + '<@' + String(keyValues_numMessages_Alpha[i][0]) + '>' + ' has a score of ' + String(keyValues_numMessages_Alpha[i][1]);
+      //   }
+      // new_text = new_text + '\n' + '\n' + 'Bad Language Ranking: '
+      // for (var i=0; i<keyValues_badWords.length; i++)
+      //   {
+      //     new_text = new_text + '\n' + String(i+1) + '. ' + '<@' + String(keyValues_badWords[i][0]) + '>' + ' has a score of ' + String(keyValues_badWords[i][1]);
+      //   }
+      // console.log(result)
+      // let text = JSON.stringify(result)
+      // let new_text = 'Bad Words Ranking: ';
+      // let num = 0;
+      // for (var key in result) {
+      //   num = num + 1;
+      //   new_text = new_text + '\n' + String(num) + '. ' + '<@' + String(key) + '>' + ' has a score of ' + String(result[key][1]);
+      //   }
 
-
-      let text = JSON.stringify(result)
       //change post endpoint before pushing to github
       axios
             .post("Change Me (from Slack API)", {
-              text: text,
+              text: new_text,
             })
             .then((res) => {
             })
             .catch((error) => {
               functions.logger.log(error);
-            }); 
+            });
     response.status(200).send(request.body.challenge)
-    } else {        
-      throw response.status(500)    
+    } else {
+      throw response.status(500)
     }});
 
  // console.log("Document data:", doc.data());
