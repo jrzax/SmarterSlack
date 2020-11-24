@@ -47,14 +47,14 @@ exports.AlphaDomination = functions.https.onRequest(
         functions.logger.log(request)
         let userID = request.body.event.user; //get user id from sent message
         let channelName = request.body.event.channel; //new doc being created for new channel
-        
+
         //BAD LANGUAGE STUFF
         let message = request.body.event.text;
         let badWordsCount = 0;
         for (let i = 0; i < pottywords.length; i++) {
           if (message.match(pottywords[i])) {
             badWordsCount += 1;
-          } 
+          }
         }
 
         functions.logger.log(today)
@@ -93,7 +93,7 @@ exports.AlphaDomination = functions.https.onRequest(
               if (snapshot.exists) {
                 //User exists, update add a document for a new day, update total counts
                 userRef.collection('history').add({
-                  numMessages: 1, numBadWords: badWordsCount, date: today 
+                  numMessages: 1, numBadWords: badWordsCount, date: today
                })
                userRef.update({
                  numMessages: admin.firestore.FieldValue.increment(1),
@@ -138,7 +138,7 @@ exports.AlphaDomination = functions.https.onRequest(
               //Testing to see if the channel exists
               if (snapshot.exists) {
                 channelRef.collection('history').add({
-                  numMessages: 1, numBadWords: badWordsCount, date: today 
+                  numMessages: 1, numBadWords: badWordsCount, date: today
                })
                channelRef.update({
                  numMessages: admin.firestore.FieldValue.increment(1),
@@ -170,10 +170,10 @@ exports.AlphaDomination = functions.https.onRequest(
 );
 
 exports.SmartReport = functions.https.onRequest(
-  async (request, response) => {   
-    if (request){    
-      functions.logger.log("Here's the request:", request.body)      
-      console.log("A request")      
+  async (request, response) => {
+    if (request){
+      functions.logger.log("Here's the request:", request.body)
+      console.log("A request")
 
       const usersRef = db.collection('users')
 
@@ -214,19 +214,28 @@ exports.SmartReport = functions.https.onRequest(
 
 
       let text = JSON.stringify(result)
+      let new_text = 'Bad Words Ranking: ';
+      let num = 0;
+      for (var key in text) {
+        if (text.hasOwnProperty(key)) {
+          num = num + 1;
+          new_text = new_text + '\n' + num + '. ' + '<@' + key + '>' + ' has a score of ' + text[key][1]);
+          }
+        }
+
       //change post endpoint before pushing to github
       axios
             .post("Change Me (from Slack API)", {
-              text: text,
+              text: new_text,
             })
             .then((res) => {
             })
             .catch((error) => {
               functions.logger.log(error);
-            }); 
+            });
     response.status(200).send(request.body.challenge)
-    } else {        
-      throw response.status(500)    
+    } else {
+      throw response.status(500)
     }});
 
  // console.log("Document data:", doc.data());
