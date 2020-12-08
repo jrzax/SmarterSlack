@@ -4,7 +4,7 @@ This project contains the necessary firebase functions for Smarter Teams in Slac
 - All git commands should be run in the SmarterSlack directory
 - Before deploying, incoming webhook key from the slack app, and the firebase key from the firebase project settings, into their corresponging locations labeled CHANGE ME
 - To deploy a new function you must first navigate to the functions folder
-  - From there, make sure node_modules is up to date by running npm install
+  - From there, make sure node_modules is up to date by running `npm install`
   - next, you can run 
     `firebase deploy --only functions:YOUR_FUNCTION_NAME`,
     FROM INSIDE THE FUNCTIONS FOLDER, to deploy to firebase
