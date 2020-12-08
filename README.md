@@ -6,15 +6,15 @@ This project contains the necessary firebase functions for Smarter Teams in Slac
 - To deploy a new function you must first navigate to the functions folder
   - From there, make sure node_modules is up to date by running npm install
   - next, you can run 
-    firebase deploy --only functions:YOUR_FUNCTION_NAME
+    `firebase deploy --only functions:YOUR_FUNCTION_NAME`,
     FROM INSIDE THE FUNCTIONS FOLDER, to deploy to firebase
   
 ## First time use
 - When configuring the Slack App, Slack asks to verify the endpoints you are using
 - To be verified, the endpoint must send back a challenge paramater to the Slack API 
 - Before verifying the endpoints, put the following line
-  response.status(200).send(request.body.challenge)
-  underneath the async(request, response) => { line
+  `response.status(200).send(request.body.challenge)`
+  underneath the `async(request, response) => { line`
  - This must be done for both functions
  - After the endpoints are verified in the Slack App, delete the added responses, and redeploy to firebase
 
