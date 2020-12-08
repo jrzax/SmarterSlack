@@ -20,7 +20,5 @@ This project contains the necessary firebase functions for Smarter Teams in Slac
 
 ## NOTES ON SECURITY
 
-- This app works with sensitive slack webhooks
-- DO NOT PUSH THESE WEBHOOKS TO GITHUB, you can get them from the Slack API. After deploying to firebase MAKE SURE YOU GET RID OF THE WEBHOOK ANYTIME YOU UPDATE THE CODEBASE. PUSHING A WEBHOOK TO GITHUB INVALIDATES IT ON FIREBASE AND BREAKS THE APP.
-  - This also means you won't have the webhooks from a function you aren't working on at that time.
-- ONLY DEPLOY THE FUNCTION YOU'RE WORKING ON TO FIREBASE. Don't just run firebase deploy, becuase this will break the other functions on firebase as their webhoks are replaced with fake values.
+- This app works with sensitive slack and firebase keys
+- DO NOT PUSH THESE KEYS TO GITHUB, you can get them from the Slack API and Firebase Project Settings. After deploying to firebase MAKE SURE YOU GET RID OF THE KEYS ANYTIME YOU UPDATE THE CODEBASE. PUSHING THESE KEYS TO GITHUB INVALIDATES THEM AND BREAKS THE APP.
