@@ -2,7 +2,7 @@ This project contains the necessary firebase functions for Smarter Teams in Slac
 
 ## How to Use
 - All git commands should be run in the SmarterSlack directory
-- Before deploying, copy the incoming webhook key from the slack app, and the firebase key from the firebase project settings, into their corresponding locations labeled CHANGE ME
+- Before deploying, copy the incoming webhook key from the slack app, and the firebase key from the firebase project settings, into their corresponding locations labeled INSERT
 - Before deploying, you must be logged into firebase. If you are not already logged in, do so by running `firebase login`
   - If this fails, you must download the firebase cli tools
 - To deploy a new function you must first navigate to the functions folder
